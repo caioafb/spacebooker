@@ -44,7 +44,7 @@ def register(request):
         confirmation = request.POST["confirmation"]
         if password != confirmation:
             return render(request, "core/register.html", {
-                "message": "Passwords must match."
+                "message": "As senhas devem coincidir."
             })
 
         # Attempt to create new user
@@ -53,7 +53,7 @@ def register(request):
             user.save()
         except IntegrityError:
             return render(request, "core/register.html", {
-                "message": "Username already taken."
+                "message": "Nome de usuário indisponível."
             })
         
         # Create new Space and sets the user as admin
@@ -85,9 +85,43 @@ def schedule(request):
 
 @login_required
 def settings(request):
+    message = None
+    error = None
+    users = request.user.space.space_users.all().exclude(id=request.user.id)
+
     if request.method == "POST":
-        pass
+        if request.POST["option"] == "insert_user":
+            username = request.POST["username"]
+            email = request.user.email
+
+            # Ensure password matches confirmation
+            password = request.POST["password"]
+            confirmation = request.POST["confirmation"]
+            if password != confirmation:
+                return render(request, "core/settings.html", {
+                    "error": "As senhas devem coincidir.",
+                    "users": users
+                })
+
+            # Attempt to create new user
+            try:
+                user = User.objects.create_user(username, email, password)
+                user.space = request.user.space
+                user.save()
+            except IntegrityError:
+                return render(request, "core/settings.html", {
+                    "error": "Nome de usuário indisponível.",
+                    "users": users
+                })
+            message = "Usuário cadastrado com sucesso."
+
+        elif request.POST["option"] == "delete_user":
+            user = User.objects.get(id = request.POST["deleted_user"])
+            user.delete()
+            message = "Usuário removido com sucesso."
 
     return render(request, "core/settings.html", {
-        "users": request.user.space.space_users.all().exclude(id=request.user.id)
+        "users": users,
+        "message": message,
+        "error": error
     })

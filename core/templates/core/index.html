@@ -2,6 +2,10 @@
 
 {% block body %}
 
+{% if message %}
+    <div id="message" class="alert alert-success">{{ message }}</div>
+{% endif %}
+
 <h2 class="d-flex justify-content-center mt-5">{{ space.name }}</h2>
     
 {% endblock %}

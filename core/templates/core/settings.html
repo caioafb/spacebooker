@@ -6,7 +6,9 @@
     <h2 class="mb-4">Configurações</h2>
 
     {% if message %}
-        <div id="message" class="alert alert-danger">{{ message }}</div>
+        <div id="message" class="alert alert-success">{{ message }}</div>
+    {% elif error %}
+        <div id="message" class="alert alert-danger">{{ error }}</div>
     {% endif %}
 
     <form action="{% url 'settings' %}" method="post">
