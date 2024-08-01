@@ -1,0 +1,35 @@
+{% extends "core/layout.html" %}
+
+{% block body %}
+
+<div class="mx-auto w-25 mt-5">
+    <h2 class="mb-4">Agendar</h2>
+
+    {% if message %}
+        <div id="message" class="alert alert-danger">{{ message }}</div>
+    {% endif %}
+
+    <form action="{% url 'schedule' %}" method="post">
+        {% csrf_token %}
+        <div class="form-floating mb-3">
+            <select class="form-control" name="user" id="user" required>
+                <option value="none" selected disabled>Selecione o usuário</option>
+                {% for user in users %}
+                    <option value="{{ user.id }}">{{ user.username }}</option>
+                {% endfor %}
+            </select>
+            <label for="user">Usuário</label>
+        </div>
+        <div class="form-floating mb-3">
+            <input class="form-control" autocomplete="off" id="start_time" name="start_time" type="time" min="08:30" max="21:00" step="900">
+            <label for="time">Início</label>
+        </div>
+        <div class="form-floating mb-3">
+            <input class="form-control" autocomplete="off" id="end_time" name="end_time" type="time" min="08:00" max="20:00" step="900">
+            <label for="time">Fim</label>
+        </div>
+        <input class="btn btn-primary" type="submit" value="Agendar">
+    </form>
+</div>
+    
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "core/layout.html" %}
+
+{% block body %}
+
+<div class="mx-auto w-25 mt-5">
+    <h2 class="mb-4">Configurações</h2>
+
+    {% if message %}
+        <div id="message" class="alert alert-danger">{{ message }}</div>
+    {% endif %}
+
+    <form action="{% url 'settings' %}" method="post">
+        {% csrf_token %}
+        <div class="form-floating mb-3">
+            <input class="form-control" autofocus type="text" name="username">
+            <label for="floatingInput">Novo usuário</label>
+        </div>
+        <div class="form-floating mb-3">
+            <input class="form-control" type="password" name="password">
+            <label for="floatingInput">Senha</label>
+        </div>
+        <div class="form-floating mb-3">
+            <input class="form-control" type="password" name="confirmation">
+            <label for="floatingInput">Confirmar senha</label>
+        </div>
+        <input type="hidden" name="option" value="insert_user">
+        <input class="btn btn-primary" type="submit" value="Cadastrar">
+    </form>
+    <hr class="my-5">
+    <form action="{% url 'settings' %}" method="post">
+        {% csrf_token %}
+        <div class="form-floating mb-3">
+            <select class="form-control" name="deleted_user" id="deleted_user" required>
+                <option value="none" selected disabled>Selecione o usuário</option>
+                {% for user in users %}
+                    <option value="{{ user.id }}">{{ user.username }}</option>
+                {% empty %}
+                    <option value="none" disabled>Nenhum usuário cadastrado.</option>
+                {% endfor %}
+            </select>
+            <label for="deleted_user">Remover usuário</label>
+        </div>
+        <input type="hidden" name="option" value="delete_user">
+        <input class="btn btn-danger" type="submit" value="Remover">
+    </form>
+</div>
+    
+{% endblock %}

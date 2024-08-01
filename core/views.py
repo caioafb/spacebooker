@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.db import IntegrityError
+from django.contrib.auth.decorators import login_required
 from core.models import *
 
 # Create your views here.
@@ -36,6 +37,7 @@ def register(request):
     if request.method == "POST":
         username = request.POST["username"]
         email = request.POST["email"]
+        spacename = request.POST["spacename"]
 
         # Ensure password matches confirmation
         password = request.POST["password"]
@@ -53,10 +55,39 @@ def register(request):
             return render(request, "core/register.html", {
                 "message": "Username already taken."
             })
+        
+        # Create new Space and sets the user as admin
+        space = Space(name=spacename, admin=user)
+        space.save()
+        user.space = space
+        user.save()
         login(request, user)
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "core/register.html")
     
+@login_required
 def index(request):
-    return render(request, "core/index.html")
+    space = request.user.space
+    return render(request, "core/index.html", {
+        "space": space
+    })
+
+@login_required
+def schedule(request):
+    if request.method == "POST":
+        pass
+
+    return render(request, "core/schedule.html", {
+        "users": request.user.space.space_users.all(),
+        "space": request.user.space
+    })
+
+@login_required
+def settings(request):
+    if request.method == "POST":
+        pass
+
+    return render(request, "core/settings.html", {
+        "users": request.user.space.space_users.all().exclude(id=request.user.id)
+    })
